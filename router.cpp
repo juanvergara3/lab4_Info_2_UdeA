@@ -11,7 +11,8 @@ Router::~Router(){
 void Router::add_link(std::string destino, int costo){
     if(links.find(destino) == links.end()) // si el enlace no existe
         links.insert(std::pair<std::string, int>(destino, costo));
-
+    else if (links[destino] == -1)
+        links[destino] = costo;
     else std::cout<<"El enlace ya existe"<<std::endl;
 }
 
@@ -23,13 +24,26 @@ void Router::modify_link(std::string destino, int costo){
 }
 
 void Router::delete_link(std::string destino){
-    if(links.find(destino) != links.end())
+    /*if(links.find(destino) != links.end())
         links.erase(destino);
-    else std::cout<<"El enlace no existe"<<std::endl;
+    else std::cout<<"El enlace no existe"<<std::endl;*/
+
+    links[destino] = -1;
+}
+
+bool Router::is_linked(std::string destino){
+
+    if(links[destino] != -1) return true;
+
+    else return false;
 }
 
 void Router::view_links(){ // should it display itself??, also it make prettier
     for(links_iterator = links.begin(); links_iterator != links.end(); links_iterator++)
-        std::cout<<links_iterator->first<<": "<<links_iterator->second<<'\t';
+
+        if(links_iterator->second != -1)
+            std::cout<<links_iterator->first<<": "<<links_iterator->second<<'\t';
+        else
+            std::cout<<links_iterator->first<<": "<<'-'<<'\t';
     std::cout<<std::endl;
 }

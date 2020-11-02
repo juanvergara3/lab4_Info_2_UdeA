@@ -20,13 +20,28 @@ private: // Metodos privados
 
 public: // Metodos publicos
     Network();
+
+    bool is_empty();
+
+    bool is_present(std::string r);
+    bool is_present(std::string r1, std::string r2);
+
     void add_router(std::string name);
-    void remove_router(std::string name);
+    void delete_router(std::string name);
+
     void display_router(std::string name);
     void display_all();
+
+    void add_link(std::string r1, std::string r2, int cost);
+    void delete_link(std::string r1, std::string r2);
+    void modify_link(std::string r1, std::string r2, int cost);
+
     void generate_network();
+
     void import_network(std::string file_name);
     void export_network(std::string file_name); // opcional. revisar si el archivo contiene cosas antes de escribir
+
+    void empty_network();
 };
 
 #endif // NETWORK_H

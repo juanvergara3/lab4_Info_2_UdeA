@@ -20,6 +20,7 @@ public: // Metodos publicos
     void add_link(std::string destino, int costo = -1);
     void modify_link(std::string destino, int costo);
     void delete_link(std::string destino);
+    bool is_linked(std::string destino);
     void view_links();
 };
 
