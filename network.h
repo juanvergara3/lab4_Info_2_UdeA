@@ -4,6 +4,8 @@
 #include "functions.h"
 #include <fstream>
 #include <cstdlib>
+#include <time.h>
+#include <windows.h>
 
 class Network
 {
@@ -42,6 +44,8 @@ public: // Metodos publicos
     void export_network(std::string file_name); // opcional. revisar si el archivo contiene cosas antes de escribir
 
     void empty_network();
+
+    void verify_integrity();
 };
 
 #endif // NETWORK_H

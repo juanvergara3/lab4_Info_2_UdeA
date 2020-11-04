@@ -21,8 +21,10 @@ bool Network::is_present(std::string r1, std::string r2){
 
         if(routing_table.find(r2) != routing_table.end()){
 
-            if(routing_table[r1].is_linked(r2) && routing_table[r2].is_linked(r1)) return true;
+            if(routing_table[r1].is_linked(r2) && routing_table[r2].is_linked(r1))
+                return true;
 
+            else return false;
         }
         else return false;
     }
@@ -65,68 +67,140 @@ void Network::add_router(std::string name){
             routing_table_iterator->second.add_link(name);
 
     }
-    else std::cout<<"El router "<<name<<" ya existe"<<std::endl;
+    //else std::cout<<"El router "<<name<<" ya existe"<<std::endl;
 }
 
-void Network::delete_router(std::string name){ // probably broken ******** gotta test it
+void Network::delete_router(std::string name){
 
-    if(routing_table.find(name) != routing_table.end()){
+   // if(routing_table.find(name) != routing_table.end()){ //these if statements are likely useless
 
         routing_table.erase(name); //delete router from routing table
 
-        for(routing_table_iterator=routing_table.begin(); routing_table_iterator != routing_table.end(); routing_table_iterator++) //delting all links with name from all existing routers
+        for(routing_table_iterator = routing_table.begin(); routing_table_iterator != routing_table.end(); routing_table_iterator++) //deleting all links with 'name' from all existing routers
             routing_table_iterator->second.delete_link(name);
 
-        for(int i = 0; i<number_of_routers; i++) //gets deleted from the list of routers
-            if(routers[i] == name){
-                routers.erase(i);
-                number_of_routers--; //what if it gets removed from the middle???? **********
-                break;
-            }
-    }
-    else std::cout<<"El router no existe"<<std::endl;
+        if(routing_table.size()>1){
+            std::map<int, std::string>temp;
+            int temp_index = 0;
+
+            for(int i = 0; i<number_of_routers; i++)
+                if(routers[i] != name){
+                    temp.insert(std::pair<int, std::string>(temp_index, routers[i]));
+                    temp_index++;
+                }
+            routers = temp;
+            number_of_routers = temp_index;
+        }
+
+        else this->empty_network();
+    //}
+    //else std::cout<<"El router no existe"<<std::endl;
 }
 
-void Network::display_router(std::string name){ // ****** make prettier
+void Network::display_router(std::string name){
 
     if(routing_table.find(name) != routing_table.end()){
         std::cout<<name<<'\t';
-        routing_table[name].view_links();
+        routing_table[name].view_links(false);
     }
 
     else std::cout<<"El router no existe"<<std::endl;
 }
 
-void Network::display_all(){ // ****** make prettier
+void Network::display_all(){
+
+    std::cout<<"\t";
 
     for(routing_table_iterator=routing_table.begin();routing_table_iterator != routing_table.end(); routing_table_iterator++){
 
         std::cout<<routing_table_iterator->first<<'\t';
-        routing_table_iterator->second.view_links();
+
+    }
+    std::cout<<std::endl;
+
+    for(routing_table_iterator=routing_table.begin();routing_table_iterator != routing_table.end(); routing_table_iterator++){
+
+        std::cout<<routing_table_iterator->first<<'\t';
+        routing_table_iterator->second.view_links(true);
         std::cout<<std::endl;
     }
 }
 
-void Network::add_link(std::string r1, std::string r2, int cost){ //this might or might not work ******
+void Network::add_link(std::string r1, std::string r2, int cost){
 
     routing_table[r1].add_link(r2, cost);
     routing_table[r2].add_link(r1, cost);
 }
 
-void Network::delete_link(std::string r1, std::string r2){ //this might or might not work ******
+void Network::delete_link(std::string r1, std::string r2){
 
     routing_table[r1].delete_link(r2);
     routing_table[r2].delete_link(r1);
 }
 
-void Network::modify_link(std::string r1, std::string r2, int cost){ //this might or might not work ******
+void Network::modify_link(std::string r1, std::string r2, int cost){
 
     routing_table[r1].modify_link(r2, cost);
     routing_table[r2].modify_link(r1, cost);
 }
 
-void Network::generate_network(){ //empty ******
+void Network::generate_network(){ //i swear to god if this keeps failing smh
 
+    srand(time(NULL));
+
+    short name_code, gen_routers = 2 + (rand() % (20 - 2 + 1));
+    std::string name;
+    int number_of_links, r1, r2, c;
+
+    while(gen_routers > number_of_routers){ // generate random routers
+
+        name_code = rand() %26 + 65;
+        name = char(name_code);
+
+        if(is_present(name) == false)
+            add_router(name);
+    }
+
+    for(int i = 0; i < number_of_routers; i++){ // makes sure each router has at least 1 link
+
+        if(routing_table[routers[i]].is_linked() == false){
+
+            while(true){
+
+                name_code = rand() % number_of_routers;
+
+                if(name_code != i){
+
+                    c = 1 + (rand() % (100));
+
+                    add_link(routers[i], routers[name_code], c);
+
+                    break;
+                }
+            }
+        }
+    }
+
+    number_of_links = (number_of_routers)*(number_of_routers - 2);
+    number_of_links = rand() % (number_of_links + 1);
+
+    while(number_of_links >= 0){ // creates a randon number of links
+
+        r1 = rand() % (number_of_routers + 1); //min + (rand() % static_cast<int>(max - min + 1))
+        r2 = rand() % (number_of_routers + 1);
+
+        if(r1 != r2){
+
+            if(is_present(routers[r1], routers[r2]) == false){
+
+                c = 1 + (rand() %(100));
+
+                modify_link(routers[r1], routers[r2], c);
+
+                number_of_links--;
+            }
+        }
+    }
 }
 
 void Network::import_network(std::string file_name){ // seems to be working just fine ******* gotta test it further
@@ -162,11 +236,41 @@ void Network::import_network(std::string file_name){ // seems to be working just
          }
          file.close();
          std::cout<<"Red importada correctamente"<<std::endl;
+         Sleep(1000);
      }
-     else std::cout<<"Error importando la red"<<std::endl;
+     else {
+         std::cout<<"Error importando la red"<<std::endl;
+         Sleep(1000);
+     }
 }
 
-void Network::empty_network()
-{
+void Network::export_network(std::string file_name){
 
+}
+
+void Network::empty_network(){
+    routers.clear();
+    routing_table.clear();
+    number_of_routers = 0;
+}
+
+void Network::verify_integrity(){
+
+    std::map<int, std::string> temp;
+    int temp_index = 0;
+
+    for(routing_table_iterator = routing_table.begin(); routing_table_iterator != routing_table.end(); routing_table_iterator++){
+
+        if(routing_table_iterator->second.is_linked() == false){
+
+            temp[temp_index] = routing_table_iterator->first;
+            temp_index++;
+        }
+    }
+
+    for(int k = 0; k<temp_index; k++){
+
+        this->delete_router(temp[k]);
+
+    }
 }
