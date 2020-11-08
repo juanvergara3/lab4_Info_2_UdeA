@@ -1,5 +1,74 @@
 #include "network.h"
 
+int Network::minDistance(int *dist, bool *sptSet){
+
+    int min = INT_MAX, min_index;
+
+    for (int v = 0; v < number_of_routers; v++)
+        if (sptSet[v] == false && dist[v] <= min)
+            min = dist[v], min_index = v;
+
+    return min_index; 
+}
+
+void Network::printPath(int *parent, int j) {
+
+    if (parent[j] == - 1 || j == 0)
+        return;
+
+    printPath(parent, parent[j]);
+
+    std::cout<<routers[j]<<' ';
+
+}
+
+void Network::printSolution(int *dist,  int *parent, int origin, int destiny){
+
+//        int src = origin;
+//        printf("Vertex\t Distance\tPath");
+
+//        for (int i = 1; i < number_of_routers; i++){
+
+//            std::cout<<'\n'<<routers[src]<<" -> "<<routers[i]<<"\t\t"<<dist[i]<<"\t\t"<<routers[src]<<' ';
+
+//            printPath(parent, i);
+//        }
+
+    printf("Vertex\t Distance\tPath");
+
+    std::cout<<'\n'<<routers[origin]<<" -> "<<routers[destiny]<<"\t\t"<<dist[destiny]<<"\t\t"<<routers[origin]<<' ';
+
+    printPath(parent, destiny);
+
+}
+
+void Network::fill_graph(int **graph){
+
+    int i = 0, j = 0;
+
+    for(routing_table_iterator = routing_table.begin(); routing_table_iterator != routing_table.end(); routing_table_iterator++){
+
+        for(routing_table_iterator->second.links_iterator = routing_table_iterator->second.links.begin(); routing_table_iterator->second.links_iterator != routing_table_iterator->second.links.end(); routing_table_iterator->second.links_iterator++){
+
+            if(routing_table_iterator->second.links_iterator->second != -1)
+                graph[i][j] = routing_table_iterator->second.links_iterator->second;
+            else
+                graph[i][j] = 0;
+            j++;
+        }
+        i++;
+        j = 0;
+    }
+}
+
+void Network::delete_graph(int **graph){
+
+    for(int i = 0; i < number_of_routers; ++i) {
+        delete[] graph[i];
+    }
+    delete[] graph;
+}
+
 Network::Network(){
 
 }
@@ -126,6 +195,137 @@ void Network::display_all(){
     }
 }
 
+void Network::display_details() {
+
+    std::string r, temp = "| ";
+
+    std::cout<<char(218);
+    for(int k = 0; k<21; k++) std::cout<<char(196);
+    std::cout<<char(191)<<std::endl;
+
+    std::cout<<"| Detalles de la red: |"<<std::endl;
+    std::cout<<"|                     |"<<std::endl;
+
+    if(number_of_routers >= 10)
+        std::cout<<"| Routers activos: "<<number_of_routers<<" |"<<std::endl;
+    else
+        std::cout<<"| Routers activos: "<<number_of_routers<<"  |"<<std::endl;
+
+    std::cout<<"|                     |"<<std::endl;
+
+    for(int k = 0; k< number_of_routers; k++){
+
+        if(temp.length() < 20){
+
+            temp += routers[k];
+            temp += ", ";
+        }
+
+        if(temp.length() == 20){
+
+            temp += "  |\n";
+            r+=temp;
+            temp.clear();
+            temp = "| ";
+        }
+    }
+
+    if(temp != "| "){
+
+        temp += "\b\b";
+
+        while(temp.length() < 24)
+            temp += " ";
+
+        temp += "  |\n";
+        r += temp;
+    }
+    else{
+
+        int index = r.rfind(",");
+        std::string res;
+
+        for(int k = 0; k< index; k++)
+            res += r[k];
+        res += "    |\n";
+        r = res;
+    }
+
+    std::cout<< r ;
+
+    std::cout<<"|                     |"<<std::endl;
+    std::cout<<char(192);
+    for(int k = 0; k<21; k++) std::cout<<char(196);
+    std::cout<<char(217)<<std::endl;
+
+}
+
+void Network::dijkstra(int origin, int destiny){
+
+    int** graph = new int*[number_of_routers]; //create 2d array
+
+    for (int i = 0; i < number_of_routers; ++i)
+        graph[i] = new int[number_of_routers];
+
+    fill_graph(graph);
+
+    for (int j = 0; j < number_of_routers; ++j) {
+            for (int i = 0; i < number_of_routers; ++i) {
+
+                if(graph[j][i] >= 10)
+                    std::cout << graph[j][i]<<"  ";
+                else if (graph[j][i] < 10)
+                    std::cout << graph[j][i]<<"   ";
+                else
+                    std::cout << graph[j][i]<<" ";
+            }
+            std::cout<< std::endl;
+        }
+    std::cout<<std::endl;
+
+    int dist[number_of_routers];
+    bool sptSet[number_of_routers];
+    int parent[number_of_routers];
+
+    for (int i = 0; i < number_of_routers; i++) {
+
+        parent[0] = -1;
+        dist[i] = INT_MAX;
+        sptSet[i] = false;
+    }
+
+    dist[origin] = 0;
+
+    for (int count = 0; count < number_of_routers - 1; count++) {
+
+        int u = minDistance(dist, sptSet);
+
+        sptSet[u] = true;
+
+        for (int v = 0; v < number_of_routers; v++)
+
+            if (!sptSet[v] && graph[u][v] &&
+                dist[u] + graph[u][v] < dist[v])
+            {
+                parent[v] = u;
+                dist[v] = dist[u] + graph[u][v];
+            }
+    }
+
+    printSolution(dist, parent, origin, destiny);
+
+    delete_graph(graph);
+}
+
+int Network::get_router_code(std::string router){
+
+    for(int k = 0; k < number_of_routers; k++)
+        if(routers[k] == router)
+            return k;
+
+   return -1;
+}
+
 void Network::add_link(std::string r1, std::string r2, int cost){
 
     routing_table[r1].add_link(r2, cost);
@@ -144,7 +344,7 @@ void Network::modify_link(std::string r1, std::string r2, int cost){
     routing_table[r2].modify_link(r1, cost);
 }
 
-void Network::generate_network(){ //i swear to god if this keeps failing smh
+void Network::generate_network(){
 
     srand(time(NULL));
 
@@ -152,9 +352,11 @@ void Network::generate_network(){ //i swear to god if this keeps failing smh
     std::string name;
     int number_of_links, r1, r2, c;
 
+    std::cout<<gen_routers<<"  ";
+
     while(gen_routers > number_of_routers){ // generate random routers
 
-        name_code = rand() %26 + 65;
+        name_code = 65 + (rand() % (90 - 65 + 1));
         name = char(name_code);
 
         if(is_present(name) == false)
@@ -181,19 +383,21 @@ void Network::generate_network(){ //i swear to god if this keeps failing smh
         }
     }
 
-    number_of_links = (number_of_routers)*(number_of_routers - 2);
-    number_of_links = rand() % (number_of_links + 1);
+    number_of_links = ((number_of_routers)*(number_of_routers - 2))/2;
+    number_of_links = 1 + (rand() % (number_of_links)); //min + (rand() % static_cast<int>(max - min + 1))
 
-    while(number_of_links >= 0){ // creates a randon number of links
+    std::cout<<number_of_routers<<"   "<<number_of_links<<std::endl;
 
-        r1 = rand() % (number_of_routers + 1); //min + (rand() % static_cast<int>(max - min + 1))
-        r2 = rand() % (number_of_routers + 1);
+    while(number_of_links > 0){ // creates a randon number of links
+
+        r1 = rand() % (number_of_routers);
+        r2 = rand() % (number_of_routers);
 
         if(r1 != r2){
 
             if(is_present(routers[r1], routers[r2]) == false){
 
-                c = 1 + (rand() %(100));
+                c = 1 + (rand() % (100));
 
                 modify_link(routers[r1], routers[r2], c);
 
@@ -203,9 +407,9 @@ void Network::generate_network(){ //i swear to god if this keeps failing smh
     }
 }
 
-void Network::import_network(std::string file_name){ // seems to be working just fine ******* gotta test it further
+void Network::import_network(std::string file_name){
 
-    std::fstream file (file_name, std:: fstream::in | std::fstream::binary); // should it be binary tho ?
+    std::fstream file (file_name, std:: fstream::in | std::fstream::binary); // should it be binary tho?
 
      if(file.is_open()){
 

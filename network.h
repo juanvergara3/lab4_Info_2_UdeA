@@ -6,6 +6,8 @@
 #include <cstdlib>
 #include <time.h>
 #include <windows.h>
+#include <limits.h>
+#include <stdio.h>
 
 class Network
 {
@@ -19,6 +21,12 @@ std::map<int, std::string> routers;
 public: // Variables publicas
 
 private: // Metodos privados
+    int minDistance(int *dist, bool *sptSet);
+    void printPath(int *parent, int j);
+    void printSolution(int *dist, int *parent, int origin, int destiny);
+
+    void fill_graph(int **graph);
+    void delete_graph(int **graph);
 
 public: // Metodos publicos
     Network();
@@ -33,6 +41,10 @@ public: // Metodos publicos
 
     void display_router(std::string name);
     void display_all();
+    void display_details();
+
+    void dijkstra(int origin, int destiny);
+    int get_router_code(std::string router);
 
     void add_link(std::string r1, std::string r2, int cost);
     void delete_link(std::string r1, std::string r2);

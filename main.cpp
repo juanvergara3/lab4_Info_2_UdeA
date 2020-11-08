@@ -10,40 +10,19 @@ int main()
 
     Network local_network;
 
-    bool loop1 = true, gen = false;
+    bool loop = true, sub_loop, gen = false;
     short selec;
     int cost;
 
-    std::string menu1 =
-            "1. Importar red\n"
-            "2. Generar red\n"
-            "3. Crear red manualmente\n"
-            "4. Salir\n"
-
-            , name1, name2, aux,
-
-            menu2 =
-            "1. Agregar router\n"
-            "2. Eliminar router\n"
-            "3. Visualizar router\n"
-            "4. Agregar enlace\n"
-            "5. Eliminar enlace\n"
-            "6. Editar enlace\n"
-            "7. Exportar red\n"
-            "8. Ver tabla de enrutamiento\n"
-            "9. Encontrar camino mas eficiente entre 2 routers\n"
-            "10. Crear nueva red\n"
-            "11. Salir\n";
+    std::string name1, name2, aux;
 
     //Menu starts here
 
-    while(loop1){
-
-        //make something to get out of menus***
+    while(loop){
 
         if(gen == false){
 
-            selec = menu_selection(menu1);
+            selec = network_creation_menu();
 
             switch (selec){
             case 1:{ //Importar red
@@ -87,11 +66,7 @@ int main()
                 break;
             }
             case 4:{ //Salir
-                loop1 = false;
-                break;
-            }
-            default:{
-                std::cout<<"Opcion no valida"<<std::endl;
+                loop = false;
                 break;
             }
             }
@@ -102,7 +77,10 @@ int main()
 
         else if(gen == true){ // if there's an existing network
 
-            selec = menu_selection(menu2);
+            system("CLS");
+
+            local_network.display_details();
+            selec = network_edit_menu();
 
             switch (selec){
             case 1:{ //Agregar router
@@ -188,10 +166,11 @@ int main()
                         std::cout<<"El router no existe"<<std::endl;
                     }
                 }
+                system("CLS");
 
                 local_network.display_router(name1);
 
-                std::cout<<"Presiona ESC para volver"<<std::endl;
+                std::cout<<"\nPresiona ESC para volver"<<std::endl;
 
                 while(true)
                     if (GetAsyncKeyState(VK_ESCAPE))
@@ -201,12 +180,15 @@ int main()
             }
             case 4:{ //Agregar enlace
 
-                while(true){
-                    while(true){
-                        std::cout<<"Ingrese el router origen: ";
+                sub_loop = true;
+                while(sub_loop){
+                    while(sub_loop){
+                        std::cout<<"Ingrese el router origen (-1 para cancelar): ";
                         std::cin>>name1;
 
                         if(local_network.is_present(name1) == true) break;
+
+                        else if(name1 == "-1") sub_loop = false;
 
                         else {
                             system("CLS");
@@ -214,11 +196,13 @@ int main()
                         }
                     }
 
-                    while(true){
-                        std::cout<<"Ingrese el router destino: ";
+                    while(sub_loop){
+                        std::cout<<"Ingrese el router destino(-1 para cancelar): ";
                         std::cin>>name2;
 
                         if(local_network.is_present(name2) == true) break;
+
+                        else if(name2 == "-1") sub_loop = false;
 
                         else {
                             system("CLS");
@@ -234,40 +218,49 @@ int main()
                     }
                 }
 
-                cost = get_cost(false);
+                if(sub_loop == true){
 
-                local_network.add_link(name1, name2, cost);
+                    cost = get_cost(false);
+
+                    local_network.add_link(name1, name2, cost);
+                }
+
 
                 break;
             }
             case 5:{ //Eliminar enlace
 
-                while(true){
-                    while(true){
-                        std::cout<<"Ingrese el router origen: ";
+                sub_loop = true;
+                while(sub_loop){
+                    while(sub_loop){
+                        std::cout<<"Ingrese el router origen (-1 para cancelar): ";
                         std::cin>>name1;
 
                         if(local_network.is_present(name1) == true) break;
 
+                        else if(name1 == "-1") sub_loop = false;
+
                         else {
                             system("CLS");
                             std::cout<<"El router no existe"<<std::endl;
                         }
                     }
 
-                    while(true){
-                        std::cout<<"Ingrese el router destino: ";
+                    while(sub_loop){
+                        std::cout<<"Ingrese el router destino(-1 para cancelar): ";
                         std::cin>>name2;
 
                         if(local_network.is_present(name2) == true) break;
 
+                        else if(name2 == "-1") sub_loop = false;
+
                         else {
                             system("CLS");
                             std::cout<<"El router no existe"<<std::endl;
                         }
                     }
 
-                    if(name1 != name2 && local_network.is_present(name1, name2)) break;
+                    if(name1 != name2) break;
 
                     else{
                         system("CLS");
@@ -275,7 +268,7 @@ int main()
                     }
                 }
 
-                while(true){ //confirmation
+                while(sub_loop){ //confirmation
 
                     std::cout<<"Esta a punto de desenlazar "<<name1<<" y "<<name2<<" (Esto puede afectar su existencia en la red). Desea continuar? (Y/N): "; std::cin>>aux;
 
@@ -298,12 +291,15 @@ int main()
             }
             case 6:{ //Editar enlace
 
-                while(true){
-                    while(true){
-                        std::cout<<"Ingrese el router origen: ";
+                sub_loop = true;
+                while(sub_loop){
+                    while(sub_loop){
+                        std::cout<<"Ingrese el router origen (-1 para cancelar): ";
                         std::cin>>name1;
 
                         if(local_network.is_present(name1) == true) break;
+
+                        else if(name1 == "-1") sub_loop = false;
 
                         else {
                             system("CLS");
@@ -311,11 +307,13 @@ int main()
                         }
                     }
 
-                    while(true){
-                        std::cout<<"Ingrese el router destino: ";
+                    while(sub_loop){
+                        std::cout<<"Ingrese el router destino(-1 para cancelar): ";
                         std::cin>>name2;
 
                         if(local_network.is_present(name2) == true) break;
+
+                        else if(name2 == "-1") sub_loop = false;
 
                         else {
                             system("CLS");
@@ -331,9 +329,38 @@ int main()
                     }
                 }
 
-                cost = get_cost(true);
+                if(sub_loop) {
 
-                local_network.modify_link(name1, name2, cost);
+                    cost = get_cost(true);
+
+                    if(cost == -1){
+                        while(sub_loop){
+
+                            std::cout<<"Esta a punto de desenlazar "<<name1<<" y "<<name2<<" (Esto puede afectar su existencia en la red). Desea continuar? (Y/N): "; std::cin>>aux;
+
+                            if(aux == "Y" || aux == "y"){
+
+                                local_network.modify_link(name1, name2, cost);
+
+                                std::cout<<"Enlace modificado correctamente";
+                                Sleep(1000);
+
+                                break;
+                            }
+                            else if(aux == "N" || aux == "n") break;
+                            else {
+                                system("CLS");
+                                std::cout<<"Opcion no valida"<<std::endl;
+                            }
+                        }
+                    }
+                    else{
+                        local_network.modify_link(name1, name2, cost);
+
+                        std::cout<<"Enlace modificado correctamente";
+                        Sleep(1000);
+                    }
+                }
 
                 break;
             }
@@ -354,6 +381,57 @@ int main()
                 break;
             }
             case 9:{ //Encontrar camino mas eficiente entre 2 routers
+
+                sub_loop = true;
+                while(sub_loop){
+                    while(sub_loop){
+                        std::cout<<"Ingrese el router origen (-1 para cancelar): ";
+                        std::cin>>name1;
+
+                        if(local_network.is_present(name1) == true) break;
+
+                        else if(name1 == "-1") sub_loop = false;
+
+                        else {
+                            system("CLS");
+                            std::cout<<"El router no existe"<<std::endl;
+                        }
+                    }
+
+                    while(sub_loop){
+                        std::cout<<"Ingrese el router destino(-1 para cancelar): ";
+                        std::cin>>name2;
+
+                        if(local_network.is_present(name2) == true) break;
+
+                        else if(name2 == "-1") sub_loop = false;
+
+                        else {
+                            system("CLS");
+                            std::cout<<"El router no existe"<<std::endl;
+                        }
+                    }
+
+                    if(name1 != name2) break;
+
+                    else{
+                        system("CLS");
+                        std::cout<<"Los routers deben ser distintos"<<std::endl;
+                    }
+                }
+
+                if(sub_loop == true){
+
+                    system("CLS");
+
+                    local_network.dijkstra(local_network.get_router_code(name1), local_network.get_router_code(name2));
+
+                    std::cout<<"\n\n"<<"Presiona ESC para volver"<<std::endl;
+
+                    while(true)
+                        if (GetAsyncKeyState(VK_ESCAPE))
+                            break;
+                }
 
                 break;
             }
@@ -382,7 +460,7 @@ int main()
                 break;
             }
             case 11:{ //Salir
-                loop1 = false;
+                loop = false;
                 break;
             }
             }

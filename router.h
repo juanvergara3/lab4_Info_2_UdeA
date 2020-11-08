@@ -7,10 +7,10 @@
 class Router
 {
 private: // Variables privadas
-    std::map<std::string, int> links; // Contiene todos los enlaces del nodo, el string es el nodo destino y el int es le costo
-    std::map<std::string, int>::iterator links_iterator;
 
 public: // Variables publicas
+    std::map<std::string, int> links; // Contiene todos los enlaces del nodo, el string es el nodo destino y el int es le costo
+    std::map<std::string, int>::iterator links_iterator;
 
 private: // Metodos privados
 
