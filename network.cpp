@@ -407,8 +407,6 @@ void Network::generate_network(){
     if(number_of_links > 0)
         number_of_links = 1 + (rand() % (number_of_links)); //min + (rand() % static_cast<int>(max - min + 1))
 
-    std::cout<<number_of_routers<<"   "<<number_of_links<<std::endl;
-
     while(number_of_links > 0){ // creates a randon number of links
 
         r1 = rand() % (number_of_routers);
@@ -470,6 +468,49 @@ void Network::import_network(std::string file_name){
 }
 
 void Network::export_network(std::string file_name){
+
+    std::fstream file (file_name, std:: fstream::out | std::fstream::binary);
+
+     if(file.is_open()){
+
+         std::string data;
+
+         std::string key1, key2;
+         int cost;
+
+         for(int i = 0; i < number_of_routers; i++){
+
+             key1 = routers[i];
+
+             for(int j = 0; j < number_of_routers; j++){
+
+                 key2 = routers[j];
+
+                 cost = routing_table[key1].links[key2];
+
+                 if(cost>0){
+                     data += key1;
+                     data += ' ';
+                     data += key2;
+                     data += ' ';
+                     data += std::to_string(cost);
+                     data += "\r\n";
+                 }
+             }
+         }
+
+         file.write(data.c_str(), data.length());
+
+         file.close();
+         std::cout<<"Red exportada correctamente"<<std::endl;
+         Sleep(1000);
+     }
+     else {
+         std::cout<<"Error exportando la red"<<std::endl;
+         Sleep(1000);
+     }
+
+
 
 }
 

@@ -1,6 +1,6 @@
 #include "functions.h"
 
-bool is_number(std::string s){
+bool is_number(std::string s) {
 
     for(unsigned long long k = 0; k<s.length(); k++){
 
@@ -10,7 +10,7 @@ bool is_number(std::string s){
     return true;
 }
 
-int get_cost(bool can_be_negative){
+int get_cost(bool can_be_negative) {
 
     int cost;
 
@@ -63,7 +63,7 @@ int get_cost(bool can_be_negative){
     return cost;
 }
 
-short network_creation_menu(){
+short network_creation_menu() {
 
     std::string menu =
             "|  Menu de creacion de red  |\n"
@@ -100,8 +100,7 @@ short network_creation_menu(){
     return selec;
 }
 
-short network_edit_menu()
-{
+short network_edit_menu() {
     std:: string menu =
             "|     Menu de edicion de red    |\n"
             "|                               |\n"
@@ -140,4 +139,43 @@ short network_edit_menu()
     system("CLS");
 
     return selec;
+}
+
+bool is_file_empty(std::string file_name){
+
+    std::fstream file (file_name, std:: fstream::in | std::fstream::binary);
+
+    if(file.is_open()){
+
+        std::string temp;
+
+        if (file >> temp){
+
+            file.close();
+            return false;
+
+        }
+         else return true;
+     }
+     else return false;
+}
+
+bool file_exists(std::string file_name) {
+
+    std::fstream file (file_name, std:: fstream::in | std::fstream::binary);
+
+    if(file.is_open()){
+        file.close();
+        return true;
+    }
+    else return false;
+}
+
+void create_file(std::string file_name){
+
+    std::fstream file (file_name, std:: fstream::out | std::fstream::binary);
+
+    if(file.is_open()){
+        file.close();
+    }
 }

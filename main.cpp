@@ -364,8 +364,42 @@ int main()
 
                 break;
             }
-            case 7:{ //Exportar red       ## opcional ##
+            case 7:{ //Exportar red
 
+                std::cout<<"Ingrese el nombre del archivo (incluyendo la extension) o -1 para cancelar: ";
+                std::cin>>name1;
+
+                if(name1 != "-1"){
+                    system("CLS");
+
+                    if(!file_exists(name1))
+                        create_file(name1);
+
+                    if(is_file_empty(name1) == true) {
+
+                        local_network.export_network(name1);
+
+                    }
+
+                    else
+                        while(true){
+
+                            std::cout<<"El archivo "<<name1<<" contiene datos y estos seran sobreescritos. Desea continuar? (Y/N): "; std::cin>>name2;
+
+                            if(name2 == "Y" || name2 == "y"){
+
+                                local_network.export_network(name1);
+
+                                break;
+                            }
+                            else if(name2 == "N" || name2 == "n") break;
+                            else {
+                                system("CLS");
+                                std::cout<<"Opcion no valida"<<std::endl;
+                            }
+                        }
+
+                }
                 break;
             }
             case 8:{ //Ver tabla de enrutamiento
@@ -436,7 +470,6 @@ int main()
                 break;
             }
             case 10:{ //Crear nueva red
-
                 while(true){
 
                     std::cout<<"Esta a punto de borrar toda la red actual. Desea continuar? (Y/N): "; std::cin>>name1;
