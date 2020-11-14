@@ -5,7 +5,7 @@ int Network::minDistance(int *dist, bool *sptSet){
     int min = INT_MAX, min_index;
 
     for (int v = 0; v < number_of_routers; v++)
-        if (sptSet[v] == false && dist[v] <= min)
+        if (sptSet[v] == false && dist[v] <= min && dist[v] != -1)
             min = dist[v], min_index = v;
 
     return min_index; 
@@ -13,13 +13,16 @@ int Network::minDistance(int *dist, bool *sptSet){
 
 void Network::printPath(int *parent, int j) {
 
-    if (parent[j] == - 1 || j == 0)
+    //if i can make this to b enot recursive i might be able to fix it by limmiting the amount of iterations
+
+
+    //if (parent[j] == - 1 || j == 0)
+      if (parent[j] == - 1)
         return;
 
     printPath(parent, parent[j]);
 
     std::cout<<routers[j]<<' ';
-
 }
 
 void Network::printSolution(int *dist,  int *parent, int origin, int destiny){
@@ -34,9 +37,9 @@ void Network::printSolution(int *dist,  int *parent, int origin, int destiny){
 //            printPath(parent, i);
 //        }
 
-    printf("Vertex\t Distance\tPath");
+    printf("Conexion\tCosto\tCamino");
 
-    std::cout<<'\n'<<routers[origin]<<" -> "<<routers[destiny]<<"\t\t"<<dist[destiny]<<"\t\t"<<routers[origin]<<' ';
+    std::cout<<'\n'<<routers[origin]<<" -> "<<routers[destiny]<<"\t\t"<<dist[destiny]<<"\t"<<routers[origin]<<' ';
 
     printPath(parent, destiny);
 
@@ -44,20 +47,35 @@ void Network::printSolution(int *dist,  int *parent, int origin, int destiny){
 
 void Network::fill_graph(int **graph){
 
-    int i = 0, j = 0;
+//    int i = 0, j = 0;
 
-    for(routing_table_iterator = routing_table.begin(); routing_table_iterator != routing_table.end(); routing_table_iterator++){
+//    for(routing_table_iterator = routing_table.begin(); routing_table_iterator != routing_table.end(); routing_table_iterator++){
 
-        for(routing_table_iterator->second.links_iterator = routing_table_iterator->second.links.begin(); routing_table_iterator->second.links_iterator != routing_table_iterator->second.links.end(); routing_table_iterator->second.links_iterator++){
+//        for(routing_table_iterator->second.links_iterator = routing_table_iterator->second.links.begin(); routing_table_iterator->second.links_iterator != routing_table_iterator->second.links.end(); routing_table_iterator->second.links_iterator++){
 
-            if(routing_table_iterator->second.links_iterator->second != -1)
-                graph[i][j] = routing_table_iterator->second.links_iterator->second;
-            else
-                graph[i][j] = 0;
-            j++;
+//            if(routing_table_iterator->second.links_iterator->second != -1)
+//                graph[i][j] = routing_table_iterator->second.links_iterator->second;
+//            else
+//                graph[i][j] = -1;
+//            j++;
+//        }
+//        i++;
+//        j = 0;
+//    }
+
+    std::string key1, key2;
+
+    for(int i = 0; i < number_of_routers; i++){
+
+        key1 = routers[i];
+
+        for(int j = 0; j < number_of_routers; j++){
+
+            key2 = routers[j];
+
+            graph[i][j] = routing_table[key1].links[key2];
+
         }
-        i++;
-        j = 0;
     }
 }
 
@@ -269,19 +287,19 @@ void Network::dijkstra(int origin, int destiny){
 
     fill_graph(graph);
 
-    for (int j = 0; j < number_of_routers; ++j) {
-            for (int i = 0; i < number_of_routers; ++i) {
+//    for (int j = 0; j < number_of_routers; ++j) {
+//            for (int i = 0; i < number_of_routers; ++i) {
 
-                if(graph[j][i] >= 10)
-                    std::cout << graph[j][i]<<"  ";
-                else if (graph[j][i] < 10)
-                    std::cout << graph[j][i]<<"   ";
-                else
-                    std::cout << graph[j][i]<<" ";
-            }
-            std::cout<< std::endl;
-        }
-    std::cout<<std::endl;
+//                if(graph[j][i] >= 10)
+//                    std::cout << graph[j][i]<<"  ";
+//                else if (graph[j][i] < 10)
+//                    std::cout << graph[j][i]<<"   ";
+//                else
+//                    std::cout << graph[j][i]<<" ";
+//            }
+//            std::cout<< std::endl;
+//        }
+//    std::cout<<std::endl;
 
     int dist[number_of_routers];
     bool sptSet[number_of_routers];
@@ -289,9 +307,11 @@ void Network::dijkstra(int origin, int destiny){
 
     for (int i = 0; i < number_of_routers; i++) {
 
-        parent[0] = -1;
+        parent[origin] = -1;
+
         dist[i] = INT_MAX;
         sptSet[i] = false;
+
     }
 
     dist[origin] = 0;
@@ -304,11 +324,11 @@ void Network::dijkstra(int origin, int destiny){
 
         for (int v = 0; v < number_of_routers; v++)
 
-            if (!sptSet[v] && graph[u][v] &&
-                dist[u] + graph[u][v] < dist[v])
-            {
+            if (!sptSet[v] && graph[u][v] && dist[u] + graph[u][v] < dist[v] && graph[u][v] != -1) {
+
                 parent[v] = u;
                 dist[v] = dist[u] + graph[u][v];
+
             }
     }
 
@@ -350,9 +370,7 @@ void Network::generate_network(){
 
     short name_code, gen_routers = 2 + (rand() % (20 - 2 + 1));
     std::string name;
-    int number_of_links, r1, r2, c;
-
-    std::cout<<gen_routers<<"  ";
+    int number_of_links, r1, r2, c, prev_links = 0;
 
     while(gen_routers > number_of_routers){ // generate random routers
 
@@ -376,6 +394,7 @@ void Network::generate_network(){
                     c = 1 + (rand() % (100));
 
                     add_link(routers[i], routers[name_code], c);
+                    prev_links++;
 
                     break;
                 }
@@ -383,8 +402,10 @@ void Network::generate_network(){
         }
     }
 
-    number_of_links = ((number_of_routers)*(number_of_routers - 2))/2;
-    number_of_links = 1 + (rand() % (number_of_links)); //min + (rand() % static_cast<int>(max - min + 1))
+    number_of_links = (((number_of_routers-1) * (number_of_routers))/2) - prev_links;
+
+    if(number_of_links > 0)
+        number_of_links = 1 + (rand() % (number_of_links)); //min + (rand() % static_cast<int>(max - min + 1))
 
     std::cout<<number_of_routers<<"   "<<number_of_links<<std::endl;
 
