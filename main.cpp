@@ -5,7 +5,6 @@
 
 int main()
 {
-
     //variable declaration
 
     Network local_network;
@@ -20,7 +19,7 @@ int main()
 
     while(loop){
 
-        if(gen == false){
+        if(gen == false){ // gen determines whether there's a valid generated network or not
 
             selec = network_creation_menu();
 
@@ -42,27 +41,54 @@ int main()
             case 2:{ //Generar red
                 local_network.generate_network();
                 gen = true;
-                std::cout<<"Red generada correctamente"<<std::endl;
+                std::cout<<"*| Red generada correctamente |*"<<std::endl;
                 Sleep(1000);
                 break;
             }
             case 3:{ //Crear red manualmente
 
-                std::cout<<"Para crear una red debes agregar minimo 2 routers y un enlace ellos. Podras modificar la red despues de crearla"<<std::endl;
+                sub_loop = true;
+                while(sub_loop){
+                    while(sub_loop){
+                        std::cout<<"Para crear una red debes agregar 2 routers y un enlace entre ellos. Podras modificar la red despues de crearla."<<std::endl;
+                        std::cout<<"Ingrese el primer router (-1 para cancelar): ";
+                        std::cin>>name1;
 
-                std::cout<<"Ingresa el nombre del primer router: ";
-                std::cin>>name1;
-                local_network.add_router(name1);
+                        if(name1 == "-1") sub_loop = false;
 
-                std::cout<<"Ingresa el nombre del segundo router: ";
-                std::cin>>name2;
-                local_network.add_router(name2);
+                        else break;
+                    }
 
-                cost = get_cost(false);
+                    while(sub_loop){
+                        std::cout<<"Ingrese el segundo router (-1 para cancelar): ";
+                        std::cin>>name2;
 
-                local_network.modify_link(name1, name2, cost);
+                        if(name2 == "-1") sub_loop = false;
 
-                gen = true;
+                        else break;
+                    }
+
+                    if(name1 != name2) break;
+
+                    else{
+                        system("CLS");
+                        std::cout<<"Los routers deben ser distintos"<<std::endl;
+                    }
+                }
+
+                if(sub_loop){
+
+                    local_network.add_router(name1);
+                    local_network.add_router(name2);
+
+                    cost = get_cost(false);
+
+                    local_network.modify_link(name1, name2, cost);
+
+                    gen = true;
+                    std::cout<<"*| Red creada correctamente |*"<<std::endl;
+                    Sleep(1000);
+                }
                 break;
             }
             case 4:{ //Salir
@@ -80,16 +106,20 @@ int main()
             system("CLS");
 
             local_network.display_details();
-            selec = network_edit_menu();
+            selec = network_edit_menu(local_network);
 
             switch (selec){
             case 1:{ //Agregar router
 
-                while(true){
-                    std::cout<<"Ingrese el nombre del nuevo router: ";
+                sub_loop = true;
+                while(sub_loop){
+
+                    std::cout<<"Ingrese el nombre del nuevo router (-1 para cancelar): ";
                     std::cin>>name1;
 
-                    if(local_network.is_present(name1) == false) break;
+                    if(local_network.is_present(name1) == false && name1 != "-1") break;
+
+                    else if (name1 == "-1") sub_loop = false;
 
                     else {
                         system("CLS");
@@ -97,33 +127,43 @@ int main()
                     }
                 }
 
-                local_network.add_router(name1);
+                if(sub_loop == true){
 
-                while(true){
-                    std::cout<<"El router debe tener minimo un enlace. Ingrese el nombre del router con que desea enlazarlo: ";
-                    std::cin>>name2;
+                    local_network.add_router(name1);
 
-                    if(local_network.is_present(name2) == true) break;
+                    while(true){
+                        std::cout<<"El router debe tener minimo un enlace. Ingrese el nombre del router con que desea enlazarlo: ";
+                        std::cin>>name2;
 
-                    else {
-                        system("CLS");
-                        std::cout<<"El router no existe"<<std::endl;
+                        if(local_network.is_present(name2) == true && name2 != name1) break;
+
+                        else if ( name2 == name1){
+                            system("CLS");
+                            std::cout<<"Los routers deben ser distintos"<<std::endl;
+                        }
+
+                        else {
+                            system("CLS");
+                            std::cout<<"El router no existe"<<std::endl;
+                        }
                     }
+
+                    cost = get_cost(false);
+
+                    local_network.add_link(name1, name2, cost);
                 }
-
-                cost = get_cost(false);
-
-                local_network.add_link(name1, name2, cost);
-
                 break;
             }
             case 2:{ //Eliminar router
 
-                while(true){
-                    std::cout<<"Ingrese el nombre del router que desea eliminar: ";
+                sub_loop = true;
+                while(sub_loop){
+                    std::cout<<"Ingrese el nombre del router que desea eliminar (-1 para cancelar): ";
                     std::cin>>name1;
 
                     if(local_network.is_present(name1) == true) break;
+
+                    else if (name1 == "-1") sub_loop = false;
 
                     else {
                         system("CLS");
@@ -131,7 +171,7 @@ int main()
                     }
                 }
 
-                while(true){ //confirmation
+                while(sub_loop){ //confirmation
 
                     std::cout<<"Esta a punto de borrar el router "<<name1<<" y todos sus enlaces (Esto puede afectar la existencia de otros routers). Desea continuar? (Y/N): "; std::cin>>name2;
 
@@ -144,7 +184,9 @@ int main()
 
                         break;
                     }
+
                     else if(name2 == "N" || name2 == "n") break;
+
                     else {
                         system("CLS");
                         std::cout<<"Opcion no valida"<<std::endl;
@@ -155,11 +197,14 @@ int main()
             }
             case 3:{ //Visualizar router
 
-                while(true){
-                    std::cout<<"Ingrese el nombre del router que desea visualizar: ";
+                sub_loop = true;
+                while(sub_loop){
+                    std::cout<<"Ingrese el nombre del router que desea visualizar (-1 para cancelar): ";
                     std::cin>>name1;
 
                     if(local_network.is_present(name1) == true) break;
+
+                    else if (name1 == "-1") sub_loop = false;
 
                     else {
                         system("CLS");
@@ -168,14 +213,15 @@ int main()
                 }
                 system("CLS");
 
-                local_network.display_router(name1);
+                if(sub_loop){
+                    local_network.display_router(name1);
 
-                std::cout<<"\nPresiona ESC para volver"<<std::endl;
+                    std::cout<<"\nPresiona ESC para volver"<<std::endl;
 
-                while(true)
-                    if (GetAsyncKeyState(VK_ESCAPE))
-                        break;
-
+                    while(true)
+                        if (GetAsyncKeyState(VK_ESCAPE))
+                            break;
+                }
                 break;
             }
             case 4:{ //Agregar enlace
@@ -224,8 +270,6 @@ int main()
 
                     local_network.add_link(name1, name2, cost);
                 }
-
-
                 break;
             }
             case 5:{ //Eliminar enlace
@@ -260,7 +304,12 @@ int main()
                         }
                     }
 
-                    if(name1 != name2) break;
+                    if(name1 != name2 && local_network.are_linked(name1, name2)) break;
+
+                    else if(!local_network.are_linked(name1, name2)){
+                        system("CLS");
+                        std::cout<<"Los routers no estan enlazados"<<std::endl;
+                    }
 
                     else{
                         system("CLS");
@@ -347,7 +396,9 @@ int main()
 
                                 break;
                             }
+
                             else if(aux == "N" || aux == "n") break;
+
                             else {
                                 system("CLS");
                                 std::cout<<"Opcion no valida"<<std::endl;
@@ -376,9 +427,7 @@ int main()
                         create_file(name1);
 
                     if(is_file_empty(name1) == true) {
-
                         local_network.export_network(name1);
-
                     }
 
                     else
@@ -392,13 +441,14 @@ int main()
 
                                 break;
                             }
+
                             else if(name2 == "N" || name2 == "n") break;
+
                             else {
                                 system("CLS");
                                 std::cout<<"Opcion no valida"<<std::endl;
                             }
                         }
-
                 }
                 break;
             }
@@ -458,7 +508,7 @@ int main()
 
                     system("CLS");
 
-                    local_network.dijkstra(local_network.get_router_code(name1), local_network.get_router_code(name2));
+                    local_network.dijkstra(name1, name2);
 
                     std::cout<<"\n\n"<<"Presiona ESC para volver"<<std::endl;
 
@@ -466,7 +516,6 @@ int main()
                         if (GetAsyncKeyState(VK_ESCAPE))
                             break;
                 }
-
                 break;
             }
             case 10:{ //Crear nueva red
@@ -484,7 +533,9 @@ int main()
 
                         break;
                     }
+
                     else if(name1 == "N" || name1 == "n") break;
+
                     else {
                         system("CLS");
                         std::cout<<"Opcion no valida"<<std::endl;

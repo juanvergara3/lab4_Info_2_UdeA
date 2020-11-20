@@ -1,7 +1,7 @@
 #ifndef NETWORK_H
 #define NETWORK_H
 #include "router.h"
-#include "functions.h"
+//#include "functions.h"
 #include <fstream>
 #include <cstdlib>
 #include <time.h>
@@ -9,18 +9,17 @@
 #include <limits.h>
 #include <stdio.h>
 
-class Network
-{
-private: // Variables privadas
-std::map<std::string, Router> routing_table; //contiene todos los nodos, el string es el nombre del nodo, y el Router contiene los enlaces de dicho nodo
+class Network {
+private: // Private variables
+std::map<std::string, Router> routing_table; // Contains every link. The string represents the node's name and the Router contains the links of said node
 std::map<std::string, Router>::iterator routing_table_iterator;
 
-int number_of_routers  = 0;
-std::map<int, std::string> routers;
+int number_of_routers = 0;
+std::map<int, std::string> routers; // Contains every node, but as an int key. It makes some tasks like dijkstra's algorithm much easier
 
-public: // Variables publicas
+public: // Public variables
 
-private: // Metodos privados
+private: // Private methods: All of these are used by dijkstra's algorithm
     int minDistance(int *dist, bool *sptSet);
     void printPath(int *parent, int j);
     void printSolution(int *dist, int *parent, int origin, int destiny);
@@ -28,13 +27,15 @@ private: // Metodos privados
     void fill_graph(int **graph);
     void delete_graph(int **graph);
 
-public: // Metodos publicos
+    int get_router_code(std::string router);
+
+public: // Public methods
     Network();
 
     bool is_empty();
 
-    bool is_present(std::string r);
-    bool is_present(std::string r1, std::string r2);
+    bool is_present(std::string r); // Checks whether a router exists or not
+    bool is_present(std::string r1, std::string r2); // Checks whether a link between r1 and r2 exists or not
 
     void add_router(std::string name);
     void delete_router(std::string name);
@@ -43,17 +44,17 @@ public: // Metodos publicos
     void display_all();
     void display_details();
 
-    void dijkstra(int origin, int destiny);
-    int get_router_code(std::string router);
+    void dijkstra(std::string r1, std::string r2);
 
     void add_link(std::string r1, std::string r2, int cost);
     void delete_link(std::string r1, std::string r2);
     void modify_link(std::string r1, std::string r2, int cost);
+    bool are_linked(std::string r1, std::string r2);
 
     void generate_network();
 
     void import_network(std::string file_name);
-    void export_network(std::string file_name); // opcional. revisar si el archivo contiene cosas antes de escribir
+    void export_network(std::string file_name);
 
     void empty_network();
 

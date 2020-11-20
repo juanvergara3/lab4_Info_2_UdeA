@@ -4,26 +4,24 @@
 #include <string>
 #include <map>
 
-class Router
-{
-private: // Variables privadas
+class Router {
+private: // Private variables
 
-public: // Variables publicas
-    std::map<std::string, int> links; // Contiene todos los enlaces del nodo, el string es el nodo destino y el int es le costo
+public: // Public varibles
+    std::map<std::string, int> links; // Contains every link the node has. the string is the node it is linked to and the int represents the cost of said link
     std::map<std::string, int>::iterator links_iterator;
 
-private: // Metodos privados
+private: // Private methods
 
-public: // Metodos publicos
+public: // Public methods
     Router();
-    ~Router();
     void add_link(std::string destino, int costo = -1);
     void modify_link(std::string destino, int costo);
     void delete_link(std::string destino);
     void unlink(std::string destino);
-    bool is_linked(std::string destino);
-    bool is_linked();
-    void view_links(bool group);
+    bool is_linked(std::string destino); // checks if a specific link exists
+    bool is_linked(); // checks is the node is linked at all
+    void view_links(bool group); // group parameter determines whehter the router displays itself or not
 };
 
 #endif // ROUTER_H

@@ -27,7 +27,6 @@ int get_cost(bool can_be_negative) {
                 std::cout<<"Ingresa el costo del enlace (0 - 100): "; std::cin>>cost;
             }
 
-
             if(cost>0 && cost <=100) break;
 
             else {
@@ -91,8 +90,16 @@ short network_creation_menu() {
         std::cin.clear();
         std::cin.ignore(std::numeric_limits<std::streamsize>::max(),'\n');
         system("CLS");
+
+        std::cout<<char(218);
+        for(int k = 0; k<27; k++) std::cout<<char(196);
+        std::cout<<char(191)<<std::endl;
         std::cout<<menu<<std::endl;
-        std::cout << "Opcion no valida"<<std::endl;
+        std::cout<<char(192);
+        for(int k = 0; k<27; k++) std::cout<<char(196);
+        std::cout<<char(217)<<std::endl;
+
+        std::cout << "   Opcion no valida"<<std::endl;
         std::cout<<"-> "; std::cin>>selec;
     }
     system("CLS");
@@ -100,7 +107,7 @@ short network_creation_menu() {
     return selec;
 }
 
-short network_edit_menu() {
+short network_edit_menu(Network& N) {
     std:: string menu =
             "|     Menu de edicion de red    |\n"
             "|                               |\n"
@@ -132,8 +139,17 @@ short network_edit_menu() {
         std::cin.clear();
         std::cin.ignore(std::numeric_limits<std::streamsize>::max(),'\n');
         system("CLS");
+
+        N.display_details();
+        std::cout<<char(218);
+        for(int k = 0; k<31; k++) std::cout<<char(196);
+        std::cout<<char(191)<<std::endl;
         std::cout<<menu<<std::endl;
-        std::cout << "Opcion no valida"<<std::endl;
+        std::cout<<char(192);
+        for(int k = 0; k<31; k++) std::cout<<char(196);
+        std::cout<<char(217)<<std::endl;
+
+        std::cout << "   Opcion no valida"<<std::endl;
         std::cout<<"-> "; std::cin>>selec;
     }
     system("CLS");

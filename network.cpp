@@ -1,7 +1,6 @@
 #include "network.h"
 
 int Network::minDistance(int *dist, bool *sptSet){
-
     int min = INT_MAX, min_index;
 
     for (int v = 0; v < number_of_routers; v++)
@@ -12,10 +11,6 @@ int Network::minDistance(int *dist, bool *sptSet){
 }
 
 void Network::printPath(int *parent, int j) {
-
-    //if i can make this to b enot recursive i might be able to fix it by limmiting the amount of iterations
-
-
     //if (parent[j] == - 1 || j == 0)
       if (parent[j] == - 1)
         return;
@@ -27,41 +22,18 @@ void Network::printPath(int *parent, int j) {
 
 void Network::printSolution(int *dist,  int *parent, int origin, int destiny){
 
-//        int src = origin;
-//        printf("Vertex\t Distance\tPath");
+    if(dist[destiny] < INT_MAX && dist[destiny] > 0){
 
-//        for (int i = 1; i < number_of_routers; i++){
+        printf("Conexion\tCosto\tCamino");
 
-//            std::cout<<'\n'<<routers[src]<<" -> "<<routers[i]<<"\t\t"<<dist[i]<<"\t\t"<<routers[src]<<' ';
+        std::cout<<'\n'<<routers[origin]<<" -> "<<routers[destiny]<<"\t\t"<<dist[destiny]<<"\t"<<routers[origin]<<' ';
 
-//            printPath(parent, i);
-//        }
-
-    printf("Conexion\tCosto\tCamino");
-
-    std::cout<<'\n'<<routers[origin]<<" -> "<<routers[destiny]<<"\t\t"<<dist[destiny]<<"\t"<<routers[origin]<<' ';
-
-    printPath(parent, destiny);
-
+        printPath(parent, destiny);
+    }
+    else std::cout<<"No existe ningun camino entre "<<routers[origin]<<" y "<<routers[destiny]<<std::endl;
 }
 
 void Network::fill_graph(int **graph){
-
-//    int i = 0, j = 0;
-
-//    for(routing_table_iterator = routing_table.begin(); routing_table_iterator != routing_table.end(); routing_table_iterator++){
-
-//        for(routing_table_iterator->second.links_iterator = routing_table_iterator->second.links.begin(); routing_table_iterator->second.links_iterator != routing_table_iterator->second.links.end(); routing_table_iterator->second.links_iterator++){
-
-//            if(routing_table_iterator->second.links_iterator->second != -1)
-//                graph[i][j] = routing_table_iterator->second.links_iterator->second;
-//            else
-//                graph[i][j] = -1;
-//            j++;
-//        }
-//        i++;
-//        j = 0;
-//    }
 
     std::string key1, key2;
 
@@ -92,7 +64,6 @@ Network::Network(){
 }
 
 bool Network::is_empty(){
-
     if(routing_table.empty()) return true;
     else return false;
 }
@@ -122,20 +93,7 @@ void Network::add_router(std::string name){
 
     if(routing_table.find(name) == routing_table.end()){
 
-        /*Router r; //doesn't take itself in account
-
-        for(int i = 0; i<number_of_routers; i++) //create links with all routers
-            r.add_link(routers[i]);
-
-        routers.insert(std::pair<int, std::string>(number_of_routers, name)); //gets added to the list of routers
-        number_of_routers++;
-
-        for(routing_table_iterator=routing_table.begin(); routing_table_iterator != routing_table.end(); routing_table_iterator++) //adding a link with name to all existing routers
-            routing_table_iterator->second.add_link(name);
-
-        routing_table.insert(std::pair<std::string, Router>(name, r)); //add new router to routing table*/
-
-        Router r; //takes itself in account
+        Router r;
 
         routers.insert(std::pair<int, std::string>(number_of_routers, name)); //gets added to the list of routers
         number_of_routers++;
@@ -150,23 +108,19 @@ void Network::add_router(std::string name){
 
         routing_table.insert(std::pair<std::string, Router>(name, r)); //add new router to routing table
 
-        for(routing_table_iterator=routing_table.begin(); routing_table_iterator != routing_table.end(); routing_table_iterator++) //adding a link with name to all existing routers
+        for(routing_table_iterator=routing_table.begin(); routing_table_iterator != routing_table.end(); routing_table_iterator++) //adding a link with "name" to all existing routers
             routing_table_iterator->second.add_link(name);
-
     }
-    //else std::cout<<"El router "<<name<<" ya existe"<<std::endl;
 }
 
 void Network::delete_router(std::string name){
-
-   // if(routing_table.find(name) != routing_table.end()){ //these if statements are likely useless
 
         routing_table.erase(name); //delete router from routing table
 
         for(routing_table_iterator = routing_table.begin(); routing_table_iterator != routing_table.end(); routing_table_iterator++) //deleting all links with 'name' from all existing routers
             routing_table_iterator->second.delete_link(name);
 
-        if(routing_table.size()>1){
+        if(routing_table.size()>1){ // Creates a new "number_of_routers" that doesn't include "name"
             std::map<int, std::string>temp;
             int temp_index = 0;
 
@@ -178,35 +132,25 @@ void Network::delete_router(std::string name){
             routers = temp;
             number_of_routers = temp_index;
         }
-
         else this->empty_network();
-    //}
-    //else std::cout<<"El router no existe"<<std::endl;
 }
 
 void Network::display_router(std::string name){
 
-    if(routing_table.find(name) != routing_table.end()){
-        std::cout<<name<<'\t';
-        routing_table[name].view_links(false);
-    }
-
-    else std::cout<<"El router no existe"<<std::endl;
+    std::cout<<name<<'\t';
+    routing_table[name].view_links(false);
 }
 
 void Network::display_all(){
 
     std::cout<<"\t";
 
-    for(routing_table_iterator=routing_table.begin();routing_table_iterator != routing_table.end(); routing_table_iterator++){
-
+    for(routing_table_iterator=routing_table.begin();routing_table_iterator != routing_table.end(); routing_table_iterator++)
         std::cout<<routing_table_iterator->first<<'\t';
 
-    }
     std::cout<<std::endl;
 
     for(routing_table_iterator=routing_table.begin();routing_table_iterator != routing_table.end(); routing_table_iterator++){
-
         std::cout<<routing_table_iterator->first<<'\t';
         routing_table_iterator->second.view_links(true);
         std::cout<<std::endl;
@@ -275,10 +219,12 @@ void Network::display_details() {
     std::cout<<char(192);
     for(int k = 0; k<21; k++) std::cout<<char(196);
     std::cout<<char(217)<<std::endl;
-
 }
 
-void Network::dijkstra(int origin, int destiny){
+void Network::dijkstra(std::string r1, std::string r2){
+
+    int origin = this->get_router_code(r1);
+    int destiny = this->get_router_code(r2);
 
     int** graph = new int*[number_of_routers]; //create 2d array
 
@@ -286,20 +232,6 @@ void Network::dijkstra(int origin, int destiny){
         graph[i] = new int[number_of_routers];
 
     fill_graph(graph);
-
-//    for (int j = 0; j < number_of_routers; ++j) {
-//            for (int i = 0; i < number_of_routers; ++i) {
-
-//                if(graph[j][i] >= 10)
-//                    std::cout << graph[j][i]<<"  ";
-//                else if (graph[j][i] < 10)
-//                    std::cout << graph[j][i]<<"   ";
-//                else
-//                    std::cout << graph[j][i]<<" ";
-//            }
-//            std::cout<< std::endl;
-//        }
-//    std::cout<<std::endl;
 
     int dist[number_of_routers];
     bool sptSet[number_of_routers];
@@ -311,7 +243,6 @@ void Network::dijkstra(int origin, int destiny){
 
         dist[i] = INT_MAX;
         sptSet[i] = false;
-
     }
 
     dist[origin] = 0;
@@ -328,7 +259,6 @@ void Network::dijkstra(int origin, int destiny){
 
                 parent[v] = u;
                 dist[v] = dist[u] + graph[u][v];
-
             }
     }
 
@@ -343,7 +273,7 @@ int Network::get_router_code(std::string router){
         if(routers[k] == router)
             return k;
 
-   return -1;
+   return -1; //this causes an exception, but main will never actually be able to reach this >:D
 }
 
 void Network::add_link(std::string r1, std::string r2, int cost){
@@ -362,6 +292,13 @@ void Network::modify_link(std::string r1, std::string r2, int cost){
 
     routing_table[r1].modify_link(r2, cost);
     routing_table[r2].modify_link(r1, cost);
+}
+
+bool Network::are_linked(std::string r1, std::string r2) {
+
+    if(routing_table[r1].is_linked(r2) && routing_table[r2].is_linked(r1)) return true;
+
+    return false;
 }
 
 void Network::generate_network(){
@@ -458,11 +395,11 @@ void Network::import_network(std::string file_name){
              counter++;
          }
          file.close();
-         std::cout<<"Red importada correctamente"<<std::endl;
+         std::cout<<"*| Red importada correctamente |*"<<std::endl;
          Sleep(1000);
      }
      else {
-         std::cout<<"Error importando la red"<<std::endl;
+         std::cout<<"!! Error importando la red !!"<<std::endl;
          Sleep(1000);
      }
 }
@@ -509,9 +446,6 @@ void Network::export_network(std::string file_name){
          std::cout<<"Error exportando la red"<<std::endl;
          Sleep(1000);
      }
-
-
-
 }
 
 void Network::empty_network(){
@@ -534,9 +468,6 @@ void Network::verify_integrity(){
         }
     }
 
-    for(int k = 0; k<temp_index; k++){
-
-        this->delete_router(temp[k]);
-
-    }
+    for(int k = 0; k<temp_index; k++)
+        this->delete_router(temp[k]); 
 }
